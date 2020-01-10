@@ -57,7 +57,7 @@ object ReadingFromKafka {
 
 
     }
-//    transaction.print()
+    transaction.print()
     env.execute()
 
 
