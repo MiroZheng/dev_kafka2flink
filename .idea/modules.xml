@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/dev_kafka2flink.iml" filepath="$PROJECT_DIR$/dev_kafka2flink.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/dev_kafka2flink.iml" filepath="$PROJECT_DIR$/.idea/dev_kafka2flink.iml" />
     </modules>
   </component>
 </project>

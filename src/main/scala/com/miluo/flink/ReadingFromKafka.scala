@@ -3,10 +3,10 @@ package com.miluo.flink
 import java.text.SimpleDateFormat
 import java.util.{Date, Properties}
 
-import com.miluo.flink.util.{HBaseUtil, Config}
+import com.alibaba.fastjson.JSON
+import com.miluo.flink.util.{Config, HBaseUtil, SinkToMysql}
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.table.api.TableEnvironment
 
 //import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
@@ -38,7 +38,6 @@ object ReadingFromKafka {
     env.getCheckpointConfig.setCheckpointTimeout(60000)
     env.getCheckpointConfig.setMaxConcurrentCheckpoints(1)
 
-    val TableEnv = TableEnvironment.getTableEnvironment(env)
 
 
     val kafkaProps = new Properties()
@@ -50,14 +49,20 @@ object ReadingFromKafka {
     val transaction = env.addSource(myConsumer)
     transaction.rebalance.map {
       value =>
+        val result = JSON.parseObject(value,classOf[student])
         println(value)
-        writeIntoHBase(value, "flink2hbase")
+        SinkToMysql.writeMysql(result.id,result.name,result.password,result.age)
+        println("insert succeed" + result.name)
+//        writeIntoHBase(value, "flink2hbase")
+
+
     }
-    transaction.print()
+//    transaction.print()
     env.execute()
 
 
   }
+  case class student(id : Int,name: String,password: String,age: Int)
 
   def writeIntoHBase(m: String, tableName: String): Unit = {
     val conn: Connection = HBaseUtil.getHBaseConn()
@@ -73,5 +78,6 @@ object ReadingFromKafka {
     put.addColumn(Bytes.toBytes("info"), Bytes.toBytes("name"), Bytes.toBytes(m))
     table.put(put)
   }
+
 
 }
